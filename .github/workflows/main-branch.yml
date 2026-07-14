@@ -38,5 +38,6 @@ jobs:
           platforms: linux/amd64
           push: true
           sbom: true
+          context: .
           tags: ghcr.io/luit/docker-go-test:main
           build-args: BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
