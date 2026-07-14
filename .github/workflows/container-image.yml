@@ -47,4 +47,4 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           sbom: true
           context: .
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.DOCKER_METADATA_OUTPUT_TAGS }}
