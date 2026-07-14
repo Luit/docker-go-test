@@ -1,8 +1,13 @@
 ---
-name: Build and push Docker image tagged main
+name: Container image build
 
 on:
   push:
+    branches:
+      - main
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+  pull_request:
     branches:
       - main
 
@@ -11,11 +16,19 @@ permissions:
 
 jobs:
   build:
-    name: Build and push Docker image tagged main
+    name: Container image build
     runs-on: ubuntu-24.04
     permissions:
       packages: write
     steps:
+      - uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/luit/docker-go-test
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -31,7 +44,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           platforms: linux/amd64
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           sbom: true
           context: .
-          tags: ghcr.io/luit/docker-go-test:main
+          tags: ${{ steps.meta.outputs.tags }}
